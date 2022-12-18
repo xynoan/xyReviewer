@@ -1,4 +1,3 @@
-
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
@@ -6,15 +5,14 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        String[] questionnaires = PhilippineMilitaryHistory.questionnaires;
-        String[] answerSheet = PhilippineMilitaryHistory.answerSheet;
-//        basic life support reviewer
+        String[] questionnaires = {""};
+        String[] answerSheet = {""};
         String[] praises = {"Great job!", "Nice!", "Keep up the good work!", "Correct!"};
         String[] motivations = {"You got this, try again!", "Don't give up!", "You're really close!"};
         HashSet<String> alreadyAsked = new HashSet<>();
         Random r = new Random();
         Scanner input = new Scanner(System.in);
-        System.out.println("Welcome to ROTC Finals Exam Reviewer!");
+        System.out.println("Welcome to 'Insert Subject' Reviewer!");
         System.out.println("Press Enter to start.");
         input.nextLine();
         int upperbound = questionnaires.length;
