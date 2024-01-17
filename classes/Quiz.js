@@ -67,7 +67,7 @@ module.exports = class Quiz {
 
   endQuiz(msg) {
     this.quizRunning = false;
-    msg.channel.send({ embeds: [Embed.finalEmbed()] });
+    msg.channel.send({ embeds: [Embed.finalEmbed()], files: ['images/eser_meme.jpg'] });
     this.resetQuestions();
   }
 

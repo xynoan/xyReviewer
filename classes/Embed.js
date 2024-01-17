@@ -22,7 +22,7 @@ module.exports = class Embed {
     return new EmbedBuilder()
     .setColor("Yellow")
     .setTitle("Thank you!")
-    .setImage('https://tinyurl.com/3u8dh3a3')
+    .setImage('attachment://eser_meme.jpg')
     .setDescription("That's all the questions :grin:");
   }
 
