@@ -109,7 +109,7 @@ module.exports = {
     
     "Understanding the users' needs and characteristics. This involves conducting user research to gain insights into the users' goals, tasks, and preferences":"User Analysis",
 
-    "Understanding the users' needs and characteristics. This involves conducting user research to gain insights into the users' goals, tasks, and preferences":"Task Analysis",
+    "Identifying the tasks that the user needs to perform, involves breaking down complex tasks into smaller, more manageable sub-tasks.":"Task Analysis",
 
     "Designing the dialogue flow that guides users through the tasks they need to perform using the system. This includes creating a logical and intuitive sequence of screens, forms, and prompts that provide users with the necessary information and actions to complete the task.":"Dialogue Design",
 
