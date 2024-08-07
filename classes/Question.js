@@ -1,5 +1,5 @@
 const Helper = new (require("./Helper.js"))();
-const HCI101 = require("../subjects/HCI101.js");
+const Research = require("../subjects/Research.js");
 
 module.exports = class Question {
 
@@ -47,6 +47,6 @@ module.exports = class Question {
   }
 
   questionAndAnswer() {
-    return HCI101;
+    return Research;
   }
 }
