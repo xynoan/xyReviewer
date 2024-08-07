@@ -14,7 +14,7 @@ module.exports = {
     "True or False FASTER DATA ANALYSIS is to obtain ore meaningful statistical result, the data must come froma large sample size.":"False",
     "True or False: OBJECTIVITY is data gathering and analysis of results aredone accurately, objectivity, and are unaffected by the researcher’s intuition and personal guesses.":"True",
     "Data taken from a sample can be applied to the population if sampling is done accordingly such us sufficient size and random samples were taken.":"GENERALIZED DATA",
-    "Depending on the types of data needed, collection can be quick and easy.":"FAST AND EASY DATA COLLECTION.",
+    "Depending on the types of data needed, collection can be quick and easy.":"FAST AND EASY DATA COLLECTION",
     "Data is taken and analyzed objectively from a sample as a representative of the population, making it more credible and reliable for policymaking and decision making.":"RELIABLE DATA",
     "The quantitative method canbe repeated to verify findings enhancing its validity, free from false or immature conclusions.":"HIGH REPLICABILITY", 
     "True or False: One of the advantages of QR is it is very objective.":"True",
@@ -25,5 +25,10 @@ module.exports = {
     "identifies the relationship between variables.":"CORRELATIONAL DESIGN",
     "used to investigate a possible relationship between previous events and present conditions.":"EX POST FACTO DESIGN",
     "used to established the cause and effect relationship of variables.":"QUASI-EXPERIMENTAL DESIGN",
-    "it uses random assignment of subjects and experimental manipulations.":"EXPERIMENTAL DESIGN"
+    "it uses random assignment of subjects and experimental manipulations.":"EXPERIMENTAL DESIGN",
+    "the determination of the different kinds of physical activities and how often high school students do it turning the quarantine period.":"DESCRIPTIVE DESIGN",
+    "the relationship between the amount of physical activity done and student academic achievement.":"CORRELATIONAL DESIGN",
+    "How does the parent’s academic achievement academic achievement affect the children obesity?":"EX POST FACTO DESIGN",
+    "the effects of utilizing e-learning approach in English among SHS Learners.":"QUASI-EXPERIMENTAL DESIGN",
+    "a comparison of the effects of various blended learning to the reading comprehension of elementary pupils.":"EXPERIMENTAL DESIGN"
 };
