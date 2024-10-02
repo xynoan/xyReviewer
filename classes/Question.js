@@ -1,5 +1,5 @@
 const Helper = new (require("./Helper.js"))();
-const PolGov = require("../subjects/PolGov.js");
+const AR101 = require("../subjects/AR101.js");
 
 module.exports = class Question {
 
@@ -47,6 +47,6 @@ module.exports = class Question {
   }
 
   questionAndAnswer() {
-    return PolGov;
+    return AR101;
   }
 }
