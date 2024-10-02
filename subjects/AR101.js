@@ -10,7 +10,6 @@ module.exports = {
     "It sends processed results to the outside world.":"Output Unit",
     "Used when large amounts of data have to be stored (on a more permanent basis), particularly if some data need to be accessed very frequently.":"Auxiliary Storage",
     [`Enumerate 4 main memory divisions ${enumeration}`]:"Input Storage Area, Working Storage Space, Output Storage Area, Program Storage Area",
-    [`Enumerate 4 Basic Operations of a Computer ${enumeration}`]:"Accepts Information, Information stored in the Memory is Fetched under program control into an Arithmetic and Logic Unit where it is processed, Processed Information leaves the computer through an Output Unit, All activities inside the machine are directed by the Control Unit",
     "It is the design of computers, including their Instruction Sets, Hardware Components, and System Organization.":"Computer Architecture",
     [`Enumerate 4 Types of Programming Languages ${enumeration}`]:"Machine Language, Assembly Language, High-Level Language, 4GL Language",
     [`Enumerate 3 Advantages of a High-Level Languages over Low-Level Languages ${enumeration}`]:"Easy to learn, Predefined Functions, Portability",
@@ -23,9 +22,6 @@ module.exports = {
     "NVRAM means":"Non-Volatile Random Access Memory",
     "The unit which performs most of the processing inside a computer. It processes all instructions received by software running on the PC and by other hardware components, and acts as a powerful calculator.":"Central Processing Unit",
     [`Enumerate 3 components of CPU ${enumeration}`]:"Arithmetic and Logic Unit, Control Unit, Register",
-    [`Enumerate 3 steps of Fetch/Read Data or Instruction from main Memory ${enumeration}`]:"The CPU first sends the address of the memory location to be read, The CPU then issues or sends the READ signal to the memory, The WORD is then read out of the memory and is LOADED into a CPU internal Register",
-    [`Enumerate 2 steps of Write/Store Data into main Memory ${enumeration}`]:"The CPU first sends the address of the main memory location to be written, The CPU then send the WRITE signal together with the data or WORD to be written to memory",
-    [`Enumerate 5 Basic Operational Concepts of Main Memory and CPU ${enumeration}`]:"PC is Set to Point to the first instruction of the program, The contents of the PC are transferred to the MAR and a READ signal is sent to the Main Memory, The Address WORD is read out of Main Memory and loaded to the MDR, The contents of the MDR are transferred to the IR. The instruction is ready to be decoded and executed, During the execution, the contents of the PC are incremented or updated to point to the next instruction",
     "It is the collection of wires that connects several devices within a computer system.":"Bus Structure",
     [`Enumerate 3 main grouping of Lines ${enumeration}`]:"Data Bus, Address Bus, Control Bus",
     // WEEK 4
