@@ -11,3 +11,5 @@ setupCommands(client);
 setupEventHandlers(client);
 
 client.login(process.env.BOT_TOKEN);
+
+module.exports = client;
