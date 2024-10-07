@@ -1,12 +1,13 @@
-const keepAlive = require("./server");
-const Discord = new (require("./classes/Discord.js"))();
-require('dotenv').config()
+require('dotenv').config();
+const { Client, GatewayIntentBits } = require('discord.js');
+const setupCommands = require('./commands/setupCommands');
+const setupEventHandlers = require('./events/setupEventHandlers');
 
-Discord.onReady();
+const client = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+});
 
-Discord.onMessageCreate();
+setupCommands(client);
+setupEventHandlers(client);
 
-Discord.onInteractionCreate();
-
-keepAlive();
-Discord.login(process.env.TOKEN);
+client.login(process.env.BOT_TOKEN);
