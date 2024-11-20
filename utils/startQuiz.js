@@ -82,7 +82,7 @@ async function handleMultipleChoiceQuestion(interaction, signal, question, score
 async function handleEnumerationQuestion(interaction, signal, question, scores, questionIndex) {
     const quizEmbed = new EmbedBuilder()
         .setColor('#0099ff')
-        .setTitle(`Question ${questionIndex + 1} (Enumeration)`)
+        .setTitle(`Question ${questionIndex + 1}`)
         .setDescription(question.question);
 
     const questionMessage = await interaction.channel.send({ embeds: [quizEmbed] });
