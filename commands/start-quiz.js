@@ -70,6 +70,7 @@ module.exports = {
 
             interaction.reply({ embeds: [embed] });
 
+            // Set up message collector
             const filter = (response) => response.author.id === interaction.user.id;
             const collector = interaction.channel.createMessageCollector({ filter });
 
