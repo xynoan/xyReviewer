@@ -4,9 +4,18 @@ const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'review',
-    description: 'Lists all questions for a specific subject.',
+    description: 'Lists all questions and answers for a specific subject.',
     async execute(interaction) {
         const subjectName = interaction.options.getString('subject');
+
+        if (!subjectName) {
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'You must provide a subject name.',
+                color: 0xff0000,
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
 
         try {
             const subject = await Subject.findOne({
@@ -36,7 +45,13 @@ module.exports = {
 
             const embed = createEmbed({
                 title: `Questions for "${subjectName}"`,
-                description: questions.map((q, index) => `${index + 1}. ${q.questionText}`).join('\n'),
+                description: questions
+                    .map(
+                        (q, index) =>
+                            `${index + 1}. **Question:** ${q.questionText}\n   **Answer:** ${q.answer}`
+                    )
+                    .join('\n\n'),
+                color: 0x0099ff,
             });
 
             interaction.reply({ embeds: [embed] });
