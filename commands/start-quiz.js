@@ -1,18 +1,30 @@
 const { ongoingQuizzes } = require('../quizState');
 const Question = require('../models/Question');
 const Subject = require('../models/Subject');
+const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'start-quiz',
-    description: 'Starts a quiz for a specific subject.',
+    description: 'Starts a quiz for a subject.',
     async execute(message, args) {
         const subjectName = args[0];
+
         if (!subjectName) {
-            return message.reply('Usage: /start-quiz <subjectName>');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Usage: /start-quiz <subjectName>',
+                color: 0xff0000,
+            });
+            return message.reply({ embeds: [embed] });
         }
 
         if (ongoingQuizzes[message.author.id]) {
-            return message.reply('You already have a quiz in progress. Use /stop-quiz to end it.');
+            const embed = createEmbed({
+                title: 'Quiz Already Running',
+                description: 'You already have a quiz in progress. Use /stop-quiz to end it.',
+                color: 0xffa500,
+            });
+            return message.reply({ embeds: [embed] });
         }
 
         try {
@@ -22,15 +34,26 @@ module.exports = {
             });
 
             if (!subject) {
-                return message.reply(`Subject "${subjectName}" not found.`);
+                const embed = createEmbed({
+                    title: 'Subject Not Found',
+                    description: `Subject "${subjectName}" does not exist.`,
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
             const questions = await Question.find({ subjectId: subject._id });
             if (questions.length === 0) {
-                return message.reply(`No questions available for subject "${subjectName}".`);
+                const embed = createEmbed({
+                    title: 'No Questions Found',
+                    description: `No questions available for subject "${subjectName}".`,
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
-            const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
+            const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+
             ongoingQuizzes[message.author.id] = {
                 subjectName,
                 questions: shuffledQuestions,
@@ -39,24 +62,27 @@ module.exports = {
                 wrongAnswers: [],
             };
 
-            message.reply(
-                `Starting quiz for "${subjectName}". First question:\n${shuffledQuestions[0].questionText}`
-            );
+            const embed = createEmbed({
+                title: 'Quiz Started',
+                description: `Starting quiz for "${subjectName}".\n\nFirst question:\n${shuffledQuestions[0].questionText}`,
+            });
+
+            message.reply({ embeds: [embed] });
 
             const filter = (response) => response.author.id === message.author.id;
             const collector = message.channel.createMessageCollector({ filter });
 
             collector.on('collect', (response) => {
                 const quiz = ongoingQuizzes[message.author.id];
+
                 if (!quiz) {
-                    collector.stop(); 
+                    collector.stop();
                     return;
                 }
 
                 const currentQuestion = quiz.questions[quiz.currentQuestion];
-                if (
-                    response.content.toLowerCase() === currentQuestion.answer.toLowerCase()
-                ) {
+
+                if (response.content.trim().toLowerCase() === currentQuestion.answer.toLowerCase()) {
                     quiz.correctAnswers += 1;
                     response.reply('Correct!');
                 } else {
@@ -70,30 +96,36 @@ module.exports = {
                 quiz.currentQuestion += 1;
 
                 if (quiz.currentQuestion >= quiz.questions.length) {
-                    let summary = `**Quiz Summary**:\n` +
-                        `Total Questions: ${quiz.questions.length}\n` +
-                        `Correct Answers: ${quiz.correctAnswers}\n` +
-                        `Incorrect Answers: ${quiz.questions.length - quiz.correctAnswers}\n\n`;
+                    const summaryEmbed = createEmbed({
+                        title: 'Quiz Completed',
+                        description: `Quiz completed! You got ${quiz.correctAnswers} out of ${quiz.questions.length} correct.`,
+                        color: 0x0099ff,
+                    });
 
                     if (quiz.wrongAnswers.length > 0) {
-                        summary += '**Questions You Got Wrong:**\n';
-                        quiz.wrongAnswers.forEach((item, index) => {
-                            summary += `${index + 1}. ${item.question} (Answer: ${item.correctAnswer})\n`;
+                        summaryEmbed.addFields({
+                            name: 'Wrong Answers',
+                            value: quiz.wrongAnswers
+                                .map((item) => `${item.question} (Correct: ${item.correctAnswer})`)
+                                .join('\n'),
                         });
                     }
 
-                    response.reply(summary);
+                    response.reply({ embeds: [summaryEmbed] });
                     delete ongoingQuizzes[message.author.id];
-                    collector.stop(); 
+                    collector.stop();
                 } else {
-                    response.channel.send(
-                        `Next question:\n${quiz.questions[quiz.currentQuestion].questionText}`
-                    );
+                    response.channel.send(`Next question:\n${quiz.questions[quiz.currentQuestion].questionText}`);
                 }
             });
         } catch (error) {
             console.error(error);
-            message.reply('Failed to start the quiz. Please try again later.');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Failed to start the quiz. Please try again later.',
+                color: 0xff0000,
+            });
+            message.reply({ embeds: [embed] });
         }
     },
 };

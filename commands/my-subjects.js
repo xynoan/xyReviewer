@@ -1,20 +1,36 @@
 const Subject = require('../models/Subject');
+const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'my-subjects',
     description: 'Lists all subjects for the user.',
-    async execute(message, args) {
+    async execute(message) {
         try {
             const subjects = await Subject.find({ userId: message.author.id });
+
             if (subjects.length === 0) {
-                return message.reply('You have no subjects.');
+                const embed = createEmbed({
+                    title: 'No Subjects Found',
+                    description: 'You have no subjects. Use `/add-subject` to create one.',
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
-            const subjectList = subjects.map(subject => `- ${subject.name}`).join('\n');
-            message.reply(`Your subjects:\n${subjectList}`);
+            const embed = createEmbed({
+                title: 'Your Subjects',
+                description: subjects.map((subject, index) => `${index + 1}. ${subject.name}`).join('\n'),
+            });
+
+            message.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
-            message.reply('Failed to fetch your subjects.');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Failed to fetch your subjects. Please try again later.',
+                color: 0xff0000,
+            });
+            message.reply({ embeds: [embed] });
         }
     },
 };

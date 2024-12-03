@@ -1,16 +1,22 @@
 const Question = require('../models/Question');
 const Subject = require('../models/Subject');
+const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'add-question',
-    description: 'Adds a question to a specific subject.',
+    description: 'Adds a question to a subject.',
     async execute(message, args) {
         const subjectName = args[0];
         const questionText = args.slice(1, -1).join(' ');
         const answer = args.slice(-1).join(' ');
 
         if (!subjectName || !questionText || !answer) {
-            return message.reply('Usage: /add-question <subjectName> <questionText> <answer>');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Usage: /add-question <subjectName> <questionText> <answer>',
+                color: 0xff0000,
+            });
+            return message.reply({ embeds: [embed] });
         }
 
         try {
@@ -20,7 +26,12 @@ module.exports = {
             });
 
             if (!subject) {
-                return message.reply(`Subject "${subjectName}" not found.`);
+                const embed = createEmbed({
+                    title: 'Subject Not Found',
+                    description: `Subject "${subjectName}" does not exist.`,
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
             const newQuestion = new Question({
@@ -31,10 +42,21 @@ module.exports = {
             });
 
             await newQuestion.save();
-            message.reply(`Question added to subject "${subjectName}": "${questionText}"`);
+
+            const embed = createEmbed({
+                title: 'Question Added',
+                description: `Question "${questionText}" has been added to subject "${subjectName}".`,
+            });
+
+            message.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
-            message.reply('Failed to add the question.');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'An error occurred while adding the question.',
+                color: 0xff0000,
+            });
+            message.reply({ embeds: [embed] });
         }
     },
 };

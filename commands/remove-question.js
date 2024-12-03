@@ -1,15 +1,21 @@
 const Question = require('../models/Question');
 const Subject = require('../models/Subject');
+const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'remove-question',
-    description: 'Removes a question from a specific subject.',
+    description: 'Removes a question from a subject.',
     async execute(message, args) {
         const subjectName = args[0];
         const questionText = args.slice(1).join(' ');
 
         if (!subjectName || !questionText) {
-            return message.reply('Usage: /remove-question <subjectName> <questionText>');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Usage: /remove-question <subjectName> <questionText>',
+                color: 0xff0000,
+            });
+            return message.reply({ embeds: [embed] });
         }
 
         try {
@@ -19,7 +25,12 @@ module.exports = {
             });
 
             if (!subject) {
-                return message.reply(`Subject "${subjectName}" not found.`);
+                const embed = createEmbed({
+                    title: 'Subject Not Found',
+                    description: `Subject "${subjectName}" does not exist.`,
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
             const question = await Question.findOneAndDelete({
@@ -29,13 +40,28 @@ module.exports = {
             });
 
             if (!question) {
-                return message.reply(`Question "${questionText}" not found in subject "${subjectName}".`);
+                const embed = createEmbed({
+                    title: 'Question Not Found',
+                    description: `Question "${questionText}" does not exist in subject "${subjectName}".`,
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
-            message.reply(`Question "${questionText}" has been removed from subject "${subjectName}".`);
+            const embed = createEmbed({
+                title: 'Question Removed',
+                description: `Question "${questionText}" has been removed from subject "${subjectName}".`,
+            });
+
+            message.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
-            message.reply('Failed to remove the question. Please try again.');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'An error occurred while removing the question.',
+                color: 0xff0000,
+            });
+            message.reply({ embeds: [embed] });
         }
     },
 };

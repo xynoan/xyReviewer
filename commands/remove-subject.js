@@ -1,5 +1,6 @@
-const Question = require('../models/Question');
 const Subject = require('../models/Subject');
+const Question = require('../models/Question');
+const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'remove-subject',
@@ -8,7 +9,12 @@ module.exports = {
         const subjectName = args[0];
 
         if (!subjectName) {
-            return message.reply('Usage: /remove-subject <subjectName>');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Please provide the subject name.',
+                color: 0xff0000,
+            });
+            return message.reply({ embeds: [embed] });
         }
 
         try {
@@ -18,15 +24,30 @@ module.exports = {
             });
 
             if (!subject) {
-                return message.reply(`Subject "${subjectName}" not found.`);
+                const embed = createEmbed({
+                    title: 'Subject Not Found',
+                    description: `Subject "${subjectName}" does not exist.`,
+                    color: 0xffa500,
+                });
+                return message.reply({ embeds: [embed] });
             }
 
             await Question.deleteMany({ subjectId: subject._id });
 
-            message.reply(`Subject "${subjectName}" and all associated questions have been removed.`);
+            const embed = createEmbed({
+                title: 'Subject Removed',
+                description: `Subject "${subjectName}" and all associated questions have been removed.`,
+            });
+
+            message.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
-            message.reply('Failed to remove the subject. Please try again.');
+            const embed = createEmbed({
+                title: 'Error',
+                description: 'Failed to remove the subject. Please try again later.',
+                color: 0xff0000,
+            });
+            message.reply({ embeds: [embed] });
         }
     },
 };
