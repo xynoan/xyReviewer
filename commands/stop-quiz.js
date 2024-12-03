@@ -4,8 +4,8 @@ const { createEmbed } = require('../utils/embedHelper');
 module.exports = {
     name: 'stop-quiz',
     description: 'Stops the current quiz.',
-    async execute(message) {
-        const quiz = ongoingQuizzes[message.author.id];
+    async execute(interaction) {
+        const quiz = ongoingQuizzes[interaction.user.id];
 
         if (!quiz) {
             const embed = createEmbed({
@@ -13,16 +13,17 @@ module.exports = {
                 description: 'You are not currently taking a quiz.',
                 color: 0xffa500,
             });
-            return message.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        delete ongoingQuizzes[message.author.id];
+        delete ongoingQuizzes[interaction.user.id];
 
         const embed = createEmbed({
             title: 'Quiz Stopped',
             description: `Your quiz for "${quiz.subjectName}" has been stopped.`,
+            color: 0x0099ff,
         });
 
-        message.reply({ embeds: [embed] });
+        interaction.reply({ embeds: [embed] });
     },
 };

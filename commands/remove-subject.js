@@ -5,21 +5,12 @@ const { createEmbed } = require('../utils/embedHelper');
 module.exports = {
     name: 'remove-subject',
     description: 'Removes a subject and all associated questions.',
-    async execute(message, args) {
-        const subjectName = args[0];
-
-        if (!subjectName) {
-            const embed = createEmbed({
-                title: 'Error',
-                description: 'Please provide the subject name.',
-                color: 0xff0000,
-            });
-            return message.reply({ embeds: [embed] });
-        }
+    async execute(interaction) {
+        const subjectName = interaction.options.getString('name');
 
         try {
             const subject = await Subject.findOneAndDelete({
-                userId: message.author.id,
+                userId: interaction.user.id,
                 name: subjectName,
             });
 
@@ -29,7 +20,7 @@ module.exports = {
                     description: `Subject "${subjectName}" does not exist.`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             await Question.deleteMany({ subjectId: subject._id });
@@ -39,7 +30,7 @@ module.exports = {
                 description: `Subject "${subjectName}" and all associated questions have been removed.`,
             });
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
             const embed = createEmbed({
@@ -47,7 +38,7 @@ module.exports = {
                 description: 'Failed to remove the subject. Please try again later.',
                 color: 0xff0000,
             });
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };

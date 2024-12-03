@@ -5,21 +5,12 @@ const { createEmbed } = require('../utils/embedHelper');
 module.exports = {
     name: 'review',
     description: 'Lists all questions for a specific subject.',
-    async execute(message, args) {
-        const subjectName = args[0];
-
-        if (!subjectName) {
-            const embed = createEmbed({
-                title: 'Error',
-                description: 'Usage: /review <subjectName>',
-                color: 0xff0000,
-            });
-            return message.reply({ embeds: [embed] });
-        }
+    async execute(interaction) {
+        const subjectName = interaction.options.getString('subject');
 
         try {
             const subject = await Subject.findOne({
-                userId: message.author.id,
+                userId: interaction.user.id,
                 name: subjectName,
             });
 
@@ -29,7 +20,7 @@ module.exports = {
                     description: `Subject "${subjectName}" does not exist.`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const questions = await Question.find({ subjectId: subject._id });
@@ -40,7 +31,7 @@ module.exports = {
                     description: `No questions available for subject "${subjectName}".`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const embed = createEmbed({
@@ -48,7 +39,7 @@ module.exports = {
                 description: questions.map((q, index) => `${index + 1}. ${q.questionText}`).join('\n'),
             });
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
             const embed = createEmbed({
@@ -56,7 +47,7 @@ module.exports = {
                 description: 'Failed to fetch questions. Please try again later.',
                 color: 0xff0000,
             });
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };

@@ -3,10 +3,10 @@ const { createEmbed } = require('../utils/embedHelper');
 
 module.exports = {
     name: 'my-subjects',
-    description: 'Lists all subjects for the user.',
-    async execute(message) {
+    description: 'Lists all your subjects.',
+    async execute(interaction) {
         try {
-            const subjects = await Subject.find({ userId: message.author.id });
+            const subjects = await Subject.find({ userId: interaction.user.id });
 
             if (subjects.length === 0) {
                 const embed = createEmbed({
@@ -14,7 +14,7 @@ module.exports = {
                     description: 'You have no subjects. Use `/add-subject` to create one.',
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const embed = createEmbed({
@@ -22,7 +22,7 @@ module.exports = {
                 description: subjects.map((subject, index) => `${index + 1}. ${subject.name}`).join('\n'),
             });
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
             const embed = createEmbed({
@@ -30,7 +30,7 @@ module.exports = {
                 description: 'Failed to fetch your subjects. Please try again later.',
                 color: 0xff0000,
             });
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };

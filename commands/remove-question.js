@@ -5,22 +5,13 @@ const { createEmbed } = require('../utils/embedHelper');
 module.exports = {
     name: 'remove-question',
     description: 'Removes a question from a subject.',
-    async execute(message, args) {
-        const subjectName = args[0];
-        const questionText = args.slice(1).join(' ');
-
-        if (!subjectName || !questionText) {
-            const embed = createEmbed({
-                title: 'Error',
-                description: 'Usage: /remove-question <subjectName> <questionText>',
-                color: 0xff0000,
-            });
-            return message.reply({ embeds: [embed] });
-        }
+    async execute(interaction) {
+        const subjectName = interaction.options.getString('subject');
+        const questionText = interaction.options.getString('question');
 
         try {
             const subject = await Subject.findOne({
-                userId: message.author.id,
+                userId: interaction.user.id,
                 name: subjectName,
             });
 
@@ -30,12 +21,12 @@ module.exports = {
                     description: `Subject "${subjectName}" does not exist.`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const question = await Question.findOneAndDelete({
                 subjectId: subject._id,
-                userId: message.author.id,
+                userId: interaction.user.id,
                 questionText,
             });
 
@@ -45,7 +36,7 @@ module.exports = {
                     description: `Question "${questionText}" does not exist in subject "${subjectName}".`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const embed = createEmbed({
@@ -53,7 +44,7 @@ module.exports = {
                 description: `Question "${questionText}" has been removed from subject "${subjectName}".`,
             });
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
             const embed = createEmbed({
@@ -61,7 +52,7 @@ module.exports = {
                 description: 'An error occurred while removing the question.',
                 color: 0xff0000,
             });
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };

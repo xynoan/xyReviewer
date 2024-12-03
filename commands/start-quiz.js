@@ -6,30 +6,30 @@ const { createEmbed } = require('../utils/embedHelper');
 module.exports = {
     name: 'start-quiz',
     description: 'Starts a quiz for a subject.',
-    async execute(message, args) {
-        const subjectName = args[0];
+    async execute(interaction) {
+        const subjectName = interaction.options.getString('subject');
 
         if (!subjectName) {
             const embed = createEmbed({
                 title: 'Error',
-                description: 'Usage: /start-quiz <subjectName>',
+                description: 'You must provide a subject name.',
                 color: 0xff0000,
             });
-            return message.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        if (ongoingQuizzes[message.author.id]) {
+        if (ongoingQuizzes[interaction.user.id]) {
             const embed = createEmbed({
                 title: 'Quiz Already Running',
-                description: 'You already have a quiz in progress. Use /stop-quiz to end it.',
+                description: 'You already have a quiz in progress. Use `/stop-quiz` to end it.',
                 color: 0xffa500,
             });
-            return message.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         try {
             const subject = await Subject.findOne({
-                userId: message.author.id,
+                userId: interaction.user.id,
                 name: subjectName,
             });
 
@@ -39,7 +39,7 @@ module.exports = {
                     description: `Subject "${subjectName}" does not exist.`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const questions = await Question.find({ subjectId: subject._id });
@@ -49,12 +49,12 @@ module.exports = {
                     description: `No questions available for subject "${subjectName}".`,
                     color: 0xffa500,
                 });
-                return message.reply({ embeds: [embed] });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
 
-            ongoingQuizzes[message.author.id] = {
+            ongoingQuizzes[interaction.user.id] = {
                 subjectName,
                 questions: shuffledQuestions,
                 currentQuestion: 0,
@@ -65,15 +65,16 @@ module.exports = {
             const embed = createEmbed({
                 title: 'Quiz Started',
                 description: `Starting quiz for "${subjectName}".\n\nFirst question:\n${shuffledQuestions[0].questionText}`,
+                color: 0x0099ff,
             });
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
 
-            const filter = (response) => response.author.id === message.author.id;
-            const collector = message.channel.createMessageCollector({ filter });
+            const filter = (response) => response.author.id === interaction.user.id;
+            const collector = interaction.channel.createMessageCollector({ filter });
 
             collector.on('collect', (response) => {
-                const quiz = ongoingQuizzes[message.author.id];
+                const quiz = ongoingQuizzes[interaction.user.id];
 
                 if (!quiz) {
                     collector.stop();
@@ -112,7 +113,7 @@ module.exports = {
                     }
 
                     response.reply({ embeds: [summaryEmbed] });
-                    delete ongoingQuizzes[message.author.id];
+                    delete ongoingQuizzes[interaction.user.id];
                     collector.stop();
                 } else {
                     response.channel.send(`Next question:\n${quiz.questions[quiz.currentQuestion].questionText}`);
@@ -125,7 +126,7 @@ module.exports = {
                 description: 'Failed to start the quiz. Please try again later.',
                 color: 0xff0000,
             });
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };
