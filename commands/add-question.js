@@ -10,6 +10,7 @@ module.exports = {
         const questionText = interaction.options.getString('question');
         const answer = interaction.options.getString('answer');
         await interaction.deferReply({ ephemeral: true });
+
         try {
             const subject = await Subject.findOne({
                 userId: interaction.user.id,
@@ -25,11 +26,26 @@ module.exports = {
                 return interaction.followUp({ embeds: [embed], ephemeral: true });
             }
 
+            const existingQuestion = await Question.findOne({
+                userId: interaction.user.id,
+                subjectId: subject._id,
+                questionText: questionText.trim(), 
+            });
+
+            if (existingQuestion) {
+                const embed = createEmbed({
+                    title: 'Duplicate Question',
+                    description: `The question "${questionText}" already exists in the subject "${subject.name}".`,
+                    color: 0xffa500,
+                });
+                return interaction.followUp({ embeds: [embed], ephemeral: true });
+            }
+
             const newQuestion = new Question({
                 userId: interaction.user.id,
                 subjectId: subject._id, 
-                questionText,
-                answer,
+                questionText: questionText.trim(),
+                answer: answer.trim(),
             });
 
             await newQuestion.save();
