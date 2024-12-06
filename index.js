@@ -86,3 +86,5 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch((err) => console.error('Error connecting to MongoDB:', err));
 
 client.login(process.env.DISCORD_TOKEN);
+
+module.exports = client;
