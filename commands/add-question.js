@@ -6,28 +6,28 @@ module.exports = {
     name: 'add-question',
     description: 'Adds a question to a subject.',
     async execute(interaction) {
-        const subjectName = interaction.options.getString('subject');
+        const subjectId = interaction.options.getString('subject'); 
         const questionText = interaction.options.getString('question');
         const answer = interaction.options.getString('answer');
-
+        await interaction.deferReply({ ephemeral: true });
         try {
             const subject = await Subject.findOne({
                 userId: interaction.user.id,
-                name: subjectName,
+                _id: subjectId,
             });
 
             if (!subject) {
                 const embed = createEmbed({
                     title: 'Subject Not Found',
-                    description: `Subject "${subjectName}" does not exist.`,
+                    description: `The selected subject does not exist.`,
                     color: 0xffa500,
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.followUp({ embeds: [embed], ephemeral: true });
             }
 
             const newQuestion = new Question({
                 userId: interaction.user.id,
-                subjectId: subject._id,
+                subjectId: subject._id, 
                 questionText,
                 answer,
             });
@@ -36,18 +36,19 @@ module.exports = {
 
             const embed = createEmbed({
                 title: 'Question Added',
-                description: `Question "${questionText}" has been added to subject "${subjectName}".`,
+                description: `Question "${questionText}" has been added to the subject "${subject.name}".`,
+                color: 0x00ff00,
             });
 
-            interaction.reply({ embeds: [embed] });
+            interaction.followUp({ embeds: [embed] });
         } catch (error) {
-            console.error(error);
+            console.error('Error adding question:', error);
             const embed = createEmbed({
                 title: 'Error',
-                description: 'An error occurred while adding the question.',
+                description: 'An error occurred while adding the question. Please try again later.',
                 color: 0xff0000,
             });
-            interaction.reply({ embeds: [embed], ephemeral: true });
+            interaction.followUp({ embeds: [embed], ephemeral: true });
         }
     },
 };

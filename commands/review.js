@@ -6,30 +6,30 @@ module.exports = {
     name: 'review',
     description: 'Lists all questions and answers for a specific subject.',
     async execute(interaction) {
-        const subjectName = interaction.options.getString('subject');
+        const subjectId = interaction.options.getString('subject');
+        await interaction.deferReply({ ephemeral: true });
 
-        if (!subjectName) {
+        if (!subjectId) {
             const embed = createEmbed({
                 title: 'Error',
                 description: 'You must provide a subject name.',
                 color: 0xff0000,
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.followUp({ embeds: [embed], ephemeral: true });
         }
-
         try {
             const subject = await Subject.findOne({
                 userId: interaction.user.id,
-                name: subjectName,
+                _id: subjectId,
             });
 
             if (!subject) {
                 const embed = createEmbed({
                     title: 'Subject Not Found',
-                    description: `Subject "${subjectName}" does not exist.`,
+                    description: `Subject "${subject.name}" does not exist.`,
                     color: 0xffa500,
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.followUp({ embeds: [embed], ephemeral: true });
             }
 
             const questions = await Question.find({ subjectId: subject._id });
@@ -37,14 +37,14 @@ module.exports = {
             if (questions.length === 0) {
                 const embed = createEmbed({
                     title: 'No Questions Found',
-                    description: `No questions available for subject "${subjectName}".`,
+                    description: `No questions available for subject "${subject.name}".`,
                     color: 0xffa500,
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.followUp({ embeds: [embed], ephemeral: true });
             }
 
             const embed = createEmbed({
-                title: `Questions for "${subjectName}"`,
+                title: `Questions for "${subject.name}"`,
                 description: questions
                     .map(
                         (q, index) =>
@@ -54,7 +54,7 @@ module.exports = {
                 color: 0x0099ff,
             });
 
-            interaction.reply({ embeds: [embed] });
+            interaction.followUp({ embeds: [embed] });
         } catch (error) {
             console.error(error);
             const embed = createEmbed({
@@ -62,7 +62,7 @@ module.exports = {
                 description: 'Failed to fetch questions. Please try again later.',
                 color: 0xff0000,
             });
-            interaction.reply({ embeds: [embed], ephemeral: true });
+            interaction.followUp({ embeds: [embed], ephemeral: true });
         }
     },
 };

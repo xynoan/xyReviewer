@@ -7,15 +7,16 @@ module.exports = {
     name: 'start-quiz',
     description: 'Starts a quiz for a subject.',
     async execute(interaction) {
-        const subjectName = interaction.options.getString('subject');
+        const subjectId = interaction.options.getString('subject'); // Retrieve subject ID from the options
+        await interaction.deferReply({ ephemeral: true });
 
-        if (!subjectName) {
+        if (!subjectId) {
             const embed = createEmbed({
                 title: 'Error',
-                description: 'You must provide a subject name.',
+                description: 'You must provide a subject.',
                 color: 0xff0000,
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.followUp({ embeds: [embed], ephemeral: true });
         }
 
         if (ongoingQuizzes[interaction.user.id]) {
@@ -24,32 +25,34 @@ module.exports = {
                 description: 'You already have a quiz in progress. Use `/stop-quiz` to end it.',
                 color: 0xffa500,
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.followUp({ embeds: [embed], ephemeral: true });
         }
-
         try {
             const subject = await Subject.findOne({
                 userId: interaction.user.id,
-                name: subjectName,
+                _id: subjectId,
             });
 
             if (!subject) {
                 const embed = createEmbed({
                     title: 'Subject Not Found',
-                    description: `Subject "${subjectName}" does not exist.`,
+                    description: `The selected subject does not exist.`,
                     color: 0xffa500,
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.followUp({ embeds: [embed], ephemeral: true });
             }
 
+            const subjectName = subject.name;
+
             const questions = await Question.find({ subjectId: subject._id });
+
             if (questions.length === 0) {
                 const embed = createEmbed({
                     title: 'No Questions Found',
                     description: `No questions available for subject "${subjectName}".`,
                     color: 0xffa500,
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.followUp({ embeds: [embed], ephemeral: true });
             }
 
             const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
@@ -68,9 +71,8 @@ module.exports = {
                 color: 0x0099ff,
             });
 
-            interaction.reply({ embeds: [embed] });
+            interaction.followUp({ embeds: [embed] });
 
-            // Set up message collector
             const filter = (response) => response.author.id === interaction.user.id;
             const collector = interaction.channel.createMessageCollector({ filter });
 
@@ -86,13 +88,13 @@ module.exports = {
 
                 if (response.content.trim().toLowerCase() === currentQuestion.answer.toLowerCase()) {
                     quiz.correctAnswers += 1;
-                    response.reply('Correct!');
+                    response.followUp('Correct!');
                 } else {
                     quiz.wrongAnswers.push({
                         question: currentQuestion.questionText,
                         correctAnswer: currentQuestion.answer,
                     });
-                    response.reply(`Wrong! The correct answer was: ${currentQuestion.answer}`);
+                    response.followUp(`Wrong! The correct answer was: ${currentQuestion.answer}`);
                 }
 
                 quiz.currentQuestion += 1;
@@ -113,7 +115,7 @@ module.exports = {
                         });
                     }
 
-                    response.reply({ embeds: [summaryEmbed] });
+                    response.followUp({ embeds: [summaryEmbed] });
                     delete ongoingQuizzes[interaction.user.id];
                     collector.stop();
                 } else {
@@ -127,7 +129,7 @@ module.exports = {
                 description: 'Failed to start the quiz. Please try again later.',
                 color: 0xff0000,
             });
-            interaction.reply({ embeds: [embed], ephemeral: true });
+            interaction.followUp({ embeds: [embed], ephemeral: true });
         }
     },
 };
