@@ -48,9 +48,9 @@ module.exports = {
                 description: questions
                     .map(
                         (q, index) =>
-                            `${index + 1}. **Question:** ${q.questionText}\n   **Answer:** ${q.answer}`
+                            `${index + 1}. **Question:** ${q.questionText} |   **Answer:** ${q.answer}`
                     )
-                    .join('\n\n'),
+                    .join('\n'),
                 color: 0x0099ff,
             });
 
