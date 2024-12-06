@@ -33,8 +33,9 @@ const commands = [
             {
                 name: 'subject',
                 type: 3,
-                description: 'The subject name',
+                description: 'Select the subject',
                 required: true,
+                autocomplete: true,
             },
             {
                 name: 'question',
@@ -57,8 +58,9 @@ const commands = [
             {
                 name: 'subject',
                 type: 3,
-                description: 'The subject name',
+                description: 'Select the subject',
                 required: true,
+                autocomplete: true,
             },
             {
                 name: 'question',
@@ -79,8 +81,9 @@ const commands = [
             {
                 name: 'subject',
                 type: 3,
-                description: 'The subject name',
+                description: 'Select the subject',
                 required: true,
+                autocomplete: true,
             },
         ],
     },
@@ -91,8 +94,9 @@ const commands = [
             {
                 name: 'subject',
                 type: 3,
-                description: 'The subject name',
+                description: 'Select the subject',
                 required: true,
+                autocomplete: true,
             },
         ],
     },

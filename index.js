@@ -15,19 +15,43 @@ for (const file of commandFiles) {
 }
 
 client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand()) return;
+    if (interaction.isCommand()) {
+        const command = client.commands.get(interaction.commandName);
+        if (!command) return;
 
-    const command = client.commands.get(interaction.commandName);
-    if (!command) return;
+        try {
+            await command.execute(interaction);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'There was an error while executing this command!',
+                ephemeral: true,
+            });
+        }
+    } else if (interaction.isAutocomplete()) {
+        const { commandName } = interaction;
 
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({
-            content: 'There was an error while executing this command!',
-            ephemeral: true,
-        });
+        if (commandName === 'add-question' ||
+            commandName === 'remove-question' ||
+            commandName === 'start-quiz' ||
+            commandName === 'review'
+        ) {
+            const userId = interaction.user.id;
+
+            try {
+                const subjects = await Subject.find({ userId }).sort({ createdAt: -1 }).exec();
+
+                const choices = subjects.map((subject) => ({
+                    name: subject.name,
+                    value: subject.name,
+                }));
+
+                await interaction.respond(choices.slice(0, 25));
+            } catch (error) {
+                console.error('Error fetching subjects for autocomplete:', error);
+                await interaction.respond([{ name: 'Error fetching subjects', value: 'error' }]);
+            }
+        }
     }
 });
 
@@ -36,22 +60,7 @@ client.once('ready', () => {
 });
 
 mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('Error connecting to MongoDB:', err));
-
-// async function createTestSubject(userId) {
-//     try {
-//         const testSubject = new Subject({
-//             userId: userId,
-//             name: 'Mathematics',
-//         });
-//         await testSubject.save();
-//         console.log('Test subject saved:', testSubject);
-//     } catch (err) {
-//         console.error('Error creating test subject:', err);
-//     }
-// }
-
-// createTestSubject('552020479674941441');
+    .then(() => console.log('Connected to MongoDB'))
+    .catch((err) => console.error('Error connecting to MongoDB:', err));
 
 client.login(process.env.DISCORD_TOKEN);
