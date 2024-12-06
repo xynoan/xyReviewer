@@ -21,8 +21,9 @@ const commands = [
             {
                 name: 'name',
                 type: 3,
-                description: 'The name of the subject',
+                description: 'Select the subject',
                 required: true,
+                autocomplete: true,
             },
         ],
     },

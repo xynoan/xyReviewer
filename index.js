@@ -34,7 +34,8 @@ client.on('interactionCreate', async (interaction) => {
         if (commandName === 'add-question' ||
             commandName === 'remove-question' ||
             commandName === 'start-quiz' ||
-            commandName === 'review'
+            commandName === 'review' ||
+            commandName === 'remove-subject'
         ) {
             const userId = interaction.user.id;
 
