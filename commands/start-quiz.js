@@ -7,7 +7,7 @@ module.exports = {
     name: 'start-quiz',
     description: 'Starts a quiz for a subject.',
     async execute(interaction) {
-        const subjectId = interaction.options.getString('subject'); // Retrieve subject ID from the options
+        const subjectId = interaction.options.getString('subject'); // Retrieve subject ID from options
         await interaction.deferReply({ ephemeral: true });
 
         if (!subjectId) {
@@ -27,6 +27,7 @@ module.exports = {
             });
             return interaction.followUp({ embeds: [embed], ephemeral: true });
         }
+
         try {
             const subject = await Subject.findOne({
                 userId: interaction.user.id,
@@ -36,7 +37,7 @@ module.exports = {
             if (!subject) {
                 const embed = createEmbed({
                     title: 'Subject Not Found',
-                    description: `The selected subject does not exist.`,
+                    description: 'The selected subject does not exist.',
                     color: 0xffa500,
                 });
                 return interaction.followUp({ embeds: [embed], ephemeral: true });
@@ -57,6 +58,7 @@ module.exports = {
 
             const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
 
+            // Initialize the quiz
             ongoingQuizzes[interaction.user.id] = {
                 subjectName,
                 questions: shuffledQuestions,
@@ -65,9 +67,10 @@ module.exports = {
                 wrongAnswers: [],
             };
 
+            const firstQuestion = shuffledQuestions[0];
             const embed = createEmbed({
-                title: 'Quiz Started',
-                description: `Starting quiz for "${subjectName}".\n\nFirst question:\n${shuffledQuestions[0].questionText}`,
+                title: `Quiz Started`,
+                description: `Starting quiz for "${subjectName}".\n\n**Question 1:**\n${firstQuestion.questionText}`,
                 color: 0x0099ff,
             });
 
@@ -88,13 +91,13 @@ module.exports = {
 
                 if (response.content.trim().toLowerCase() === currentQuestion.answer.toLowerCase()) {
                     quiz.correctAnswers += 1;
-                    response.followUp('Correct!');
+                    response.reply('Correct!');
                 } else {
                     quiz.wrongAnswers.push({
                         question: currentQuestion.questionText,
                         correctAnswer: currentQuestion.answer,
                     });
-                    response.followUp(`Wrong! The correct answer was: ${currentQuestion.answer}`);
+                    response.reply(`Wrong! The correct answer was: ${currentQuestion.answer}`);
                 }
 
                 quiz.currentQuestion += 1;
@@ -115,11 +118,18 @@ module.exports = {
                         });
                     }
 
-                    response.followUp({ embeds: [summaryEmbed] });
+                    response.reply({ embeds: [summaryEmbed] });
                     delete ongoingQuizzes[interaction.user.id];
                     collector.stop();
                 } else {
-                    response.channel.send(`Next question:\n${quiz.questions[quiz.currentQuestion].questionText}`);
+                    const nextQuestion = quiz.questions[quiz.currentQuestion];
+                    const nextQuestionEmbed = createEmbed({
+                        title: `Question ${quiz.currentQuestion + 1}`,
+                        description: `${nextQuestion.questionText}`,
+                        color: 0x0099ff,
+                    });
+
+                    response.channel.send({ embeds: [nextQuestionEmbed] });
                 }
             });
         } catch (error) {
