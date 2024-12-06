@@ -42,7 +42,9 @@ client.on('interactionCreate', async (interaction) => {
 
             const focusedOption = options.getFocused(true);
 
-            if (focusedOption.name === 'subject') {
+            if (focusedOption.name === 'subject' ||
+                focusedOption.name === 'name'
+            ) {
                 try {
                     const subjects = await Subject.find({ userId }).sort({ createdAt: -1 }).exec();
                     const choices = subjects.map((subject) => ({
