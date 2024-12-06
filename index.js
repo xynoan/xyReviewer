@@ -5,6 +5,7 @@ const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 });
 const Subject = require('./models/Subject');
+const Question = require('./models/Question');
 const fs = require('fs');
 
 client.commands = new Map();
@@ -29,7 +30,7 @@ client.on('interactionCreate', async (interaction) => {
             });
         }
     } else if (interaction.isAutocomplete()) {
-        const { commandName } = interaction;
+        const { commandName, options } = interaction;
 
         if (commandName === 'add-question' ||
             commandName === 'remove-question' ||
@@ -39,18 +40,36 @@ client.on('interactionCreate', async (interaction) => {
         ) {
             const userId = interaction.user.id;
 
-            try {
-                const subjects = await Subject.find({ userId }).sort({ createdAt: -1 }).exec();
+            const focusedOption = options.getFocused(true);
 
-                const choices = subjects.map((subject) => ({
-                    name: subject.name,
-                    value: subject.name,
-                }));
+            if (focusedOption.name === 'subject') {
+                try {
+                    const subjects = await Subject.find({ userId }).sort({ createdAt: -1 }).exec();
+                    const choices = subjects.map((subject) => ({
+                        name: subject.name,
+                        value: subject._id.toString(), 
+                    }));
+                    await interaction.respond(choices.slice(0, 25));
+                } catch (error) {
+                    console.error('Error fetching subjects:', error);
+                    await interaction.respond([{ name: 'Error loading subjects', value: 'error' }]);
+                }
+            } else if (focusedOption.name === 'question') {
+                const subjectId = options.getString('subject'); 
 
-                await interaction.respond(choices.slice(0, 25));
-            } catch (error) {
-                console.error('Error fetching subjects for autocomplete:', error);
-                await interaction.respond([{ name: 'Error fetching subjects', value: 'error' }]);
+                try {
+                    const questions = await Question.find({ userId, subjectId }).sort({ createdAt: -1 }).exec();
+                    const choices = questions.map((question) => ({
+                        name: question.questionText.length > 100
+                            ? question.questionText.slice(0, 97) + '...'
+                            : question.questionText, 
+                        value: question._id.toString(), 
+                    }));
+                    await interaction.respond(choices.slice(0, 25));
+                } catch (error) {
+                    console.error('Error fetching questions:', error);
+                    await interaction.respond([{ name: 'Error loading questions', value: 'error' }]);
+                }
             }
         }
     }

@@ -66,8 +66,9 @@ const commands = [
             {
                 name: 'question',
                 type: 3,
-                description: 'The question text',
+                description: 'The question to remove',
                 required: true,
+                autocomplete: true,
             },
         ],
     },
